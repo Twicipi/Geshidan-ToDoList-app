@@ -4,42 +4,16 @@ import AddTodoForm from "./components/AddTodoForm";
 import TodoList from "./components/TodoList";
 import TodoSummary from "./components/TodoSummary";
 import { Todo } from "./types/todo";
+import useTodos from "./hooks/useTodos";
 
 function App() {
-  const [todos, setTodos] = useState<Todo[]>(() => {
-    const savedTodos = localStorage.getItem("todos");
-    return savedTodos ? JSON.parse(savedTodos) : dummyData;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
-
-  function setTodoCompleted(id: number, completed: boolean) {
-    setTodos((prevTodos) =>
-      prevTodos.map((todo) => (todo.id === id ? { ...todo, completed } : todo))
-    );
-  }
-
-  function addTodo(title: string) {
-    setTodos((prevTodos) => [
-      ...prevTodos,
-      {
-        id: Date.now(),
-        title: title,
-        completed: false,
-      },
-    ]);
-  }
-
-  function deleteTodo(id: number) {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
-  }
-
-  function deleteAllCompletedTodos() {
-    setTodos((prevTodos) => prevTodos.filter((todo) => !todo.completed));
-  }
-
+  const {
+    todos,
+    addTodo,
+    setTodoCompleted,
+    deleteTodo,
+    deleteAllCompletedTodos,
+  } = useTodos();
   return (
     <main className="py-10 h-screen space-y-5 overflow-y-auto">
       <h1 className="font-bold text-3xl text-center">Your Todos</h1>
@@ -51,10 +25,7 @@ function App() {
           onDelete={deleteTodo}
         />
       </div>
-      <TodoSummary
-        todos={todos}
-        deleteAllCompleted={deleteAllCompletedTodos}
-      />
+      <TodoSummary todos={todos} deleteAllCompleted={deleteAllCompletedTodos} />
     </main>
   );
 }
